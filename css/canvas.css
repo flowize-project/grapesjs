@@ -1,0 +1,18 @@
+.gjs-placeholder-int, .gjs-com-placeholder-int, .gjs-placeholder-int{
+    background-color: #3b97e3 !important;
+}
+
+.gjs-cv-canvas .gjs-comp-selected {
+    outline: 3px solid #fc563a !important
+}
+
+*.gjs-com-hover, div.gjs-com-hover {
+    outline: 1px solid #fc563a;
+}
+
+.gjs-comp-selected-parent {
+    outline: 2px solid #fc563a !important;
+}
+
+
+

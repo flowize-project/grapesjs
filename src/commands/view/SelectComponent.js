@@ -82,24 +82,32 @@ module.exports = {
    * @private
    */
   onHover(e) {
-    e.stopPropagation();
-    let trg = e.target;
-    let model = $(trg).data('model');
+    try {
+      e.stopPropagation();
+      var trg = e.target;
+      var model = $(trg).data('model');
 
-    // Adjust tools scroll top
-    if (!this.adjScroll) {
-      this.adjScroll = 1;
-      this.onFrameScroll(e);
-      this.updateAttached();
+      // Adjust tools scroll top
+      if (!this.adjScroll) {
+        this.adjScroll = 1;
+        this.onFrameScroll(e);
+        this.updateAttached();
+      }
+
+      if (model && !model.get('hoverable')) {
+        var parent = model && model.parent();
+        while (parent && !parent.get('hoverable')) {
+          if (parent) {
+            parent = parent.parent();
+          }
+        }
+        model = parent;
+      }
+
+      this.em.setHovered(model, { forceChange: 1 });
+    } catch (err) {
+      console.log(err.message);
     }
-
-    if (model && !model.get('hoverable')) {
-      let parent = model && model.parent();
-      while (parent && !parent.get('hoverable')) parent = comp.parent();
-      model = parent;
-    }
-
-    this.em.setHovered(model, { forceChange: 1 });
   },
 
   onHovered(em, component) {

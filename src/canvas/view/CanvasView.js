@@ -158,11 +158,12 @@ module.exports = Backbone.View.extend({
         ${protCss || ''}
       `;
 
+      body.append('<style>' + frameCss + '</style>');
+      // More priority to external resources
       if (externalStyles) {
         body.append(externalStyles);
       }
 
-      body.append('<style>' + frameCss + '</style>');
       body.append(wrap.render()).append(cssc.render());
       body.append(this.getJsContainer());
       em.trigger('loaded');

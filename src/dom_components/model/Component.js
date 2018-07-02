@@ -559,6 +559,13 @@ const Component = Backbone.Model.extend(Styleable).extend(
             command: 'tlb-clone'
           });
         }
+        // To include languages option on the toolbar
+        if (model.get('languages')) {
+          tb.push({
+            attributes: { class: 'fa fa-language' },
+            command: 'tlb-languages'
+          });
+        }
         if (model.get('removable')) {
           tb.push({
             attributes: { class: 'fa fa-trash-o' },

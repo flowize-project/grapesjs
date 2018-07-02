@@ -122,6 +122,11 @@ module.exports = config => {
     config: c
   });
 
+  /**
+   * @property boolean
+   */
+  var is_visible_mode_on = false;
+
   return {
     $,
 
@@ -473,6 +478,18 @@ module.exports = config => {
      */
     getDevice() {
       return em.get('device');
+    },
+
+    /**
+     * New function to check if we are in Preview Mode
+     * @returns {*}
+     */
+    getPreviewMode: function getPreviewMode() {
+      return is_visible_mode_on;
+    },
+
+    setPreviewMode: function setPreviewMode(visible) {
+      is_visible_mode_on = visible;
     },
 
     /**

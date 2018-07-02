@@ -1,0 +1,17 @@
+
+#gjs-rte-toolbar, .gjs-bg-main, .gjs-one-bg .gjs-two-color, .gjs-pn-panel, .gjs-clm-select option, .gjs-clm-tags .gjs-sm-colorp-c, .gjs-editor, .gjs-mdl-dialog, .gjs-nv-item .gjs-nv-title-c, .gjs-off-prv, .gjs-pn-panel, .gjs-select option, .gjs-sm-sector .gjs-sm-colorp-c, .gjs-sm-select option, .gjs-sm-unit option, .sp-container, .gjs-block {
+    background-color: white;
+}
+#gjs-rte-toolbar .gjs-rte-btn, .gjs-btn-prim, .gjs-btnt, .gjs-clm-tags .gjs-sm-composite.gjs-clm-field, .gjs-clm-tags .gjs-sm-field.gjs-sm-composite, .gjs-clm-tags .gjs-sm-stack #gjs-sm-add, .gjs-color-main, .gjs-mdl-dialog, .gjs-off-prv, .gjs-pn-btn, .gjs-pn-panel, .gjs-sm-sector .gjs-sm-composite.gjs-clm-field, .gjs-sm-sector .gjs-sm-field.gjs-sm-composite, .gjs-sm-sector .gjs-sm-stack #gjs-sm-add {
+    color: #777;
+}
+.gjs-btnt.gjs-pn-active, .gjs-color-active, .gjs-pn-btn.gjs-pn-active, .gjs-pn-btn:active, .gjs-block:hover {
+    color: #59a6e6;
+}
+.gjs-btnt.gjs-pn-active, .gjs-pn-btn.gjs-pn-active {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.gjs-pn-btn:hover {
+    color: rgba(0, 0, 0, 0.75);
+}

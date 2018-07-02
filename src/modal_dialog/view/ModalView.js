@@ -3,7 +3,7 @@ module.exports = require('backbone').View.extend({
     return `<div class="${pfx}dialog ${ppfx}one-bg ${ppfx}two-color">
       <div class="${pfx}header">
         <div class="${pfx}title">${title}</div>
-        <div class="${pfx}btn-close">&Cross;</div>
+        <div class="${pfx}btn-close">Close</div>
       </div>
       <div class="${pfx}content">
         <div id="${pfx}c">${content}</div>
