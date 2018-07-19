@@ -83,6 +83,13 @@ module.exports = {
       });
     }
 
+    var revertBtn = editor.Panels.getButton('options', 'revert-from-published');
+    if (revertBtn) {
+      revertBtn.set('attributes', {
+        style: 'display:none'
+      });
+    }
+
     var no_preview = document.body.querySelector('.fa-eye');
     no_preview.className += ' hidden';
 
@@ -172,6 +179,13 @@ module.exports = {
     var clearalloBtn = editor.Panels.getButton('options', 'clear-all');
     if (clearalloBtn) {
       clearalloBtn.set('attributes', {
+        style: 'display:flex'
+      });
+    }
+
+    var revertBtn = editor.Panels.getButton('options', 'revert-from-published');
+    if (revertBtn) {
+      revertBtn.set('attributes', {
         style: 'display:flex'
       });
     }

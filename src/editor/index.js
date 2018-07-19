@@ -284,6 +284,14 @@ module.exports = config => {
     },
 
     /**
+     * Returns HTML + CSS inline built inside canvas
+     * @return {string} HTML string
+     */
+    getHtmlInline(opts) {
+      return em.getHtmlInline(opts);
+    },
+
+    /**
      * Returns CSS built inside canvas
      * @param {Object} [opts={}] Options
      * @return {string} CSS string

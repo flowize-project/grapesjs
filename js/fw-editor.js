@@ -9,6 +9,7 @@ var images = [
     host + 'img/tmp-devices.jpg',
 ];
 
+
 var editor = grapesjs.init({
     clearOnRender: true,
     showDevices: false,
@@ -17,11 +18,11 @@ var editor = grapesjs.init({
     devicePreviewMode: 1,
     height: '100%',
     container : '#gjs',
-    forceClass: false,
-    fromElement: 1,
+    forceClass: true,
+    fromElement: false,
     showOffsets: 1,
     noticeOnUnload: false,
-    exportWrapper: true, // Allow you to export body attributes and html header
+    exportWrapper: false, // Allow you to export body attributes and html header
     commands: {
         defaults: [
             window['grapesjs-code-editor'].codeCommand,
@@ -57,7 +58,23 @@ var editor = grapesjs.init({
             options: {
                 language: 'en',
                 skin: 'moono-dark',
-            }
+                toolbarGroups : [
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                    { name: 'editing', groups: [ 'find', 'selection', 'editing' ] },
+                    { name: 'forms', groups: [ 'forms' ] },
+
+                    { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
+                    { name: 'links', groups: [ 'links' ] },
+                    { name: 'insert', groups: [ 'insert' ] },
+
+                    { name: 'styles', groups: [ 'styles' ] },
+                    { name: 'colors', groups: [ 'colors' ] },
+                    { name: 'tools', groups: [ 'tools' ] },
+                    { name: 'others', groups: [ 'others' ] },
+                    { name: 'about', groups: [ 'about' ] }
+                ],
+                removeButtons : 'NewPage,Preview,Print,Save,Source,Templates,Undo,Redo,Find,Replace,SelectAll,Scayt,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,Base64Image,HiddenField,CreateDiv,Language,BidiRtl,BidiLtr,Anchor,Image,Flash,PageBreak,Iframe,About,ShowBlocks,toc'
+            },
         }
 
     },
@@ -73,14 +90,19 @@ var editor = grapesjs.init({
     },
     storageManager: {
         type: 'remote',
-        stepsBeforeSave: 3,
+        stepsBeforeSave: 1,
         autoload: true,
-        contentTypeJson: true,
+        autorender: true,
+        autosave: false,
         urlStore: '/save.php',
         urlLoad: '/load.php',
-        // For custom parameters/headers on requests
-        params: {  },
-        headers: {  },
+        contentTypeJson: true,
+        storeComponents: true,
+        storeStyles: true,
+        storeHtml: true,
+        storeCss: true,
+        storeAssets: false,
+
     },
     styleManager : {
         sectors: [{
@@ -380,13 +402,7 @@ var editor = grapesjs.init({
 
 });
 
-// To manage assets folder
-editor.on('storage:load', function(obj) {
-   // console.log('Loaded ', obj);
-})
-editor.on('storage:store', function(obj) {
-    //console.log('Stored ', obj);
-})
+
 
 editor.on('change:changesCount', (model) => {
     //console.log('changed');
@@ -448,7 +464,7 @@ $.ajax({
         //editor.AssetManager.add(images_loaded); //adding images to asset manager of GrapesJS
 
         assetManager.load({
-            storageType  	: '',
+            //storageType  	: '',
             storeOnChange  : true,
             storeAfterUpload  : true,
             upload: 'upload_image.php',        //for temporary storage
@@ -592,9 +608,13 @@ editor.DomComponents.addType('cell', {
 
 editor.Commands.add('open-texteditor', {
     run:  function(editor, sender,data){
+
         data.component = data.component || editor.getSelected();
         this.rte = editor && editor.RichTextEditor;
         this.rte.enable(data.component.view);
+
+
+
 
     },
     stop:  function(editor, sender){
@@ -615,6 +635,8 @@ editor.Commands.add('close-texteditor', {
 
     },
 });
+
+
 
 
 
@@ -946,9 +968,20 @@ pnm.addButton('options', [
 );
 
 editor.Commands.add('save-database', {
-    run: function (em, sender) {
-        sender.set('active', true);
+    run: function (editor, sender) {
         var InnerHtml = this.frameEl.contentDocument.activeElement.innerHTML;
+
+        sender && sender.set('active'); // turn off the button
+
+
+        editor.store();
+
+
+
+        //console.log(editor.getHtmlInline());
+
+        //console.log("Count" + editor.getDirtyCount());
+
         //console.log(InnerHtml);
         /*$.post("/components/save/component", {
             html: InnerHtml
@@ -958,7 +991,21 @@ editor.Commands.add('save-database', {
         });*/
     }
 });
+
+editor.on('storage:load', function(e) {
+    //console.log('Loaded Content', e);
+});
+
+editor.on('storage:store', function(e) {
+    //console.log('Stored Content', e);
+});
+
+editor.on('storage:error', function(e) {
+    //console.log('Error Content', e);
+});
 /*****************************************/
+
+
 
 
 
@@ -1341,6 +1388,75 @@ domc.addType('custom_blocks', {
 });
 /**********************************************/
 
+if (!InlineEditor) {
+    throw new Error('CKEDITOR instance not found');
+}
+
+editor.setCustomRte({
+
+    enable(el, rte) {
+        // If already exists I'll just focus on it
+        if(rte && rte.status != 'destroyed') {
+            this.focus(el, rte);
+            return rte;
+        }
+
+        el.contentEditable = true;
+
+        // Seems like 'sharedspace' plugin doesn't work exactly as expected
+        // so will help hiding other toolbars already created
+        let rteToolbar = editor.RichTextEditor.getToolbarEl();
+        [].forEach.call(rteToolbar.children, (child) => {
+            child.style.display = 'none';
+        });
+
+
+
+        // Init CkEditors
+        rte = InlineEditor
+            .create( el )
+            .catch( error => {
+                console.error( error );
+            } );
+
+        if(rte){
+            // // Prevent blur when some of CKEditor's element is clicked
+            rte.on('mousedown', e => {
+                const editorEls = grapesjs.$('.gjs-rte-toolbar');
+                ['off', 'on'].forEach(m => editorEls[m]('mousedown', stopPropagation));
+            });
+
+            editor.RichTextEditor.getToolbarEl().appendChild( rte.ui.view.toolbar.element );
+            el.contentEditable = true;
+        }else{
+            console.log( 'Editor was not initialized' );
+        }
+        this.focus(el, rte);
+
+
+        return rte;
+    },
+
+    disable(el, rte) {
+        el.contentEditable = false;
+
+    },
+
+    focus(el, rte) {
+        // Do nothing if already focused
+
+        el.contentEditable = true;
+
+    },
+});
+
+// Update RTE toolbar position
+editor.on('rteToolbarPosUpdate', (pos) => {
+    if (pos.top <= pos.canvasTop) {
+        pos.top = pos.elementTop + pos.elementHeight;
+    }
+});
+
 
 
 
@@ -1459,6 +1575,22 @@ editor.on('load', function() {
 
         setVisible('#gjs', true);
         setFade('.js-fw-preloader', false);
+
+        const getAllComponents = (model, result = []) => {
+
+            model.forEach(_ => {
+                /*console.log(
+                    _.attributes
+
+                );*/
+                result.push(_.attributes);
+
+            });
+            return result;
+        }
+        const all = getAllComponents(editor.DomComponents.getComponents());
+
+        //console.log(all);
     });
 
 
@@ -1612,8 +1744,6 @@ function getWindowDims() {
 
     return {width: width, height: height};
 }
-
-
 
 
 

@@ -395,6 +395,18 @@ module.exports = Backbone.Model.extend({
   },
 
   /**
+   * Returns HTML + CSS inline built inside canvas
+   * @param {Object} [opts={}] Options
+   * @return {string} CSS string
+   * @private
+   */
+  getHtmlInline(opts = {}) {
+    var juice = require('juice');
+    const tmpl = this.getHtml() + `<style>${this.getCss(opts)}</style>`;
+    return juice(tmpl);
+  },
+
+  /**
    * Returns CSS built inside canvas
    * @param {Object} [opts={}] Options
    * @return {string} CSS string

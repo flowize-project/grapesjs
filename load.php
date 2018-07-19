@@ -1,5 +1,5 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: text/html; charset=utf-8');
 // Load html content by default
 $html = file_get_contents('templates/hotel-template/index.html');
 //$html = file_get_contents('templates/magazine-template/index.html');
@@ -12,5 +12,6 @@ $content = [
     "style"         => null,
 ];
 
+//echo $html;
 echo json_encode($content);
 ?>
