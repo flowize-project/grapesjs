@@ -160,6 +160,7 @@ module.exports = Backbone.View.extend({
 
       body.append('<style>' + frameCss + '</style>');
       // More priority to external resources
+
       if (externalStyles) {
         body.append(externalStyles);
       }

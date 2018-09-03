@@ -105,9 +105,9 @@ module.exports = {
     this.tglPointers(editor);
 
     /*
-      editor.Canvas.getBody().querySelectorAll('.' + pfx + 'no-pointer').forEach(function(){
-        this.style.pointerEvents = 'all';
-      });*/
+          editor.Canvas.getBody().querySelectorAll('.' + pfx + 'no-pointer').forEach(function(){
+            this.style.pointerEvents = 'all';
+          });*/
 
     panels.style.display = 'block';
     var canvasS = canvas.style;

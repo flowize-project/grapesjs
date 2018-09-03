@@ -9,7 +9,7 @@ let showOffsets;
 
 module.exports = {
   init(o) {
-    bindAll(this, 'onHover', 'onOut', 'onClick', 'onKeyPress', 'onFrameScroll');
+    bindAll(this, 'onHover', 'onOut', 'onClick', 'onFrameScroll');
   },
 
   enable() {
@@ -53,27 +53,8 @@ module.exports = {
     methods[method](body, 'mouseout', this.onOut);
     methods[method](body, 'click', this.onClick);
     methods[method](win, 'scroll resize', this.onFrameScroll);
-    methods[method](win, 'keydown', this.onKeyPress);
     em[method]('component:toggled', this.onSelect, this);
     em[method]('change:componentHovered', this.onHovered, this);
-  },
-
-  /**
-   * On key press event
-   * @private
-   * */
-  onKeyPress(e) {
-    var key = e.which || e.keyCode;
-    var comp = this.editorModel.getSelected();
-    var focused = this.frameEl.contentDocument.activeElement.tagName !== 'BODY';
-
-    // On CANC (46) or Backspace (8)
-    if (key == 8 || key == 46) {
-      if (!focused) e.preventDefault();
-      if (comp && !focused) {
-        this.editor.runCommand('core:component-delete');
-      }
-    }
   },
 
   /**
@@ -82,32 +63,23 @@ module.exports = {
    * @private
    */
   onHover(e) {
-    try {
-      e.stopPropagation();
-      var trg = e.target;
-      var model = $(trg).data('model');
+    e.stopPropagation();
+    let trg = e.target;
+    let model = $(trg).data('model');
 
-      // Adjust tools scroll top
-      if (!this.adjScroll) {
-        this.adjScroll = 1;
-        this.onFrameScroll(e);
-        this.updateAttached();
-      }
-
-      if (model && !model.get('hoverable')) {
-        var parent = model && model.parent();
-        while (parent && !parent.get('hoverable')) {
-          if (parent) {
-            parent = parent.parent();
-          }
-        }
-        model = parent;
-      }
-
-      this.em.setHovered(model, { forceChange: 1 });
-    } catch (err) {
-      console.log(err.message);
+    // Adjust tools scroll top
+    if (!this.adjScroll) {
+      this.adjScroll = 1;
+      this.updateAttached();
     }
+
+    if (model && !model.get('hoverable')) {
+      let parent = model && model.parent();
+      while (parent && !parent.get('hoverable')) parent = parent.parent();
+      model = parent;
+    }
+
+    this.em.setHovered(model, { forceChange: 1 });
   },
 
   onHovered(em, component) {
@@ -201,10 +173,16 @@ module.exports = {
     let model = $el.data('model');
 
     if (!model) {
-      let parent = $el.parent();
+      var parent = $el.parent();
+
       while (!model && parent) {
         model = parent.data('model');
-        parent = parent.parent();
+        // This line is important if someone clicks out of the body wrapper. It avoids to crash the dom element.
+        if (typeof parent[0] != 'undefined' && parent[0].localName == 'html') {
+          parent = false;
+        } else {
+          parent = parent.parent();
+        }
       }
     }
 
@@ -508,7 +486,9 @@ module.exports = {
 
       this.toolbar.reset(toolbar);
       const view = model.view;
-      view && this.updateToolbarPos(view.el);
+      toolbarStyle.top = '-100px';
+      toolbarStyle.left = 0;
+      setTimeout(() => view && this.updateToolbarPos(view.el), 0);
     } else {
       toolbarStyle.display = 'none';
     }
@@ -523,8 +503,7 @@ module.exports = {
     var unit = 'px';
     var toolbarEl = this.canvas.getToolbarEl();
     var toolbarStyle = toolbarEl.style;
-    const origDisp = toolbarStyle.display;
-    toolbarStyle.display = 'block';
+    toolbarStyle.opacity = 0;
     var pos = this.canvas.getTargetToElementDim(toolbarEl, el, {
       elPos,
       event: 'toolbarPosUpdate'
@@ -533,7 +512,7 @@ module.exports = {
       var leftPos = pos.left + pos.elementWidth - pos.targetWidth;
       toolbarStyle.top = pos.top + unit;
       toolbarStyle.left = (leftPos < 0 ? 0 : leftPos) + unit;
-      toolbarStyle.display = origDisp;
+      toolbarStyle.opacity = '';
     }
   },
 
@@ -581,7 +560,6 @@ module.exports = {
 
   /**
    * Update attached elements, eg. component toolbar
-   * @return {[type]} [description]
    */
   updateAttached(updated) {
     const model = this.em.getSelected();

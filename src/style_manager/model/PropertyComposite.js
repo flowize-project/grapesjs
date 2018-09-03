@@ -48,7 +48,7 @@ module.exports = Property.extend({
       // 11px -> 11px 11px 11px 11xp
       // 11px 22px -> 11px 22px 11px 22xp
       const value =
-        values[i] || values[i % len + (len != 1 && len % 2 ? 1 : 0)];
+        values[i] || values[(i % len) + (len != 1 && len % 2 ? 1 : 0)];
       // There some issue with UndoManager
       //property.setValue(value, 0, {fromParent: 1});
     });

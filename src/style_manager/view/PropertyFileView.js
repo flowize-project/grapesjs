@@ -85,8 +85,13 @@ module.exports = PropertyView.extend({
    * */
   setPreview(value) {
     const preview = this.$preview;
-    value = value && value.indexOf('url(') < 0 ? `url(${value})` : value;
-    preview && preview.css('background-image', value);
+    value = value && value.indexOf('url(') < 0 ? 'url(' + value + ')' : value;
+    if (value !== undefined && value != 'url(none)') {
+      preview && preview.css('background-image', value);
+    } else if (value == 'url(none)' || value !== undefined) {
+      value = 'transparent';
+      preview && preview.css('background-image', 'transparent');
+    }
   },
 
   /** @inheritdoc */
@@ -113,19 +118,20 @@ module.exports = PropertyView.extend({
    * @return void
    * */
   openAssetManager(e) {
-    var that = this;
-    var em = this.em;
-    var editor = em ? em.get('Editor') : '';
+    const that = this;
+    const { em, modal } = this;
+    const editor = em ? em.get('Editor') : '';
 
     if (editor) {
-      this.modal.setTitle('Select image');
-      this.modal.setContent(this.am.getContainer());
-      this.am.setTarget(null);
       editor.runCommand('open-assets', {
-        target: this.model,
-        onSelect(target) {
-          that.modal.close();
-          that.spreadUrl(target.get('src'));
+        types: ['image'],
+        accept: 'image/*',
+        target: this.getTargetModel(),
+        onClick() {},
+        onDblClick() {},
+        onSelect(asset) {
+          modal.close();
+          that.spreadUrl(asset.get('src'));
         }
       });
     }

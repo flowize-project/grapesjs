@@ -1388,74 +1388,7 @@ domc.addType('custom_blocks', {
 });
 /**********************************************/
 
-if (!InlineEditor) {
-    throw new Error('CKEDITOR instance not found');
-}
 
-editor.setCustomRte({
-
-    enable(el, rte) {
-        // If already exists I'll just focus on it
-        if(rte && rte.status != 'destroyed') {
-            this.focus(el, rte);
-            return rte;
-        }
-
-        el.contentEditable = true;
-
-        // Seems like 'sharedspace' plugin doesn't work exactly as expected
-        // so will help hiding other toolbars already created
-        let rteToolbar = editor.RichTextEditor.getToolbarEl();
-        [].forEach.call(rteToolbar.children, (child) => {
-            child.style.display = 'none';
-        });
-
-
-
-        // Init CkEditors
-        rte = InlineEditor
-            .create( el )
-            .catch( error => {
-                console.error( error );
-            } );
-
-        if(rte){
-            // // Prevent blur when some of CKEditor's element is clicked
-            rte.on('mousedown', e => {
-                const editorEls = grapesjs.$('.gjs-rte-toolbar');
-                ['off', 'on'].forEach(m => editorEls[m]('mousedown', stopPropagation));
-            });
-
-            editor.RichTextEditor.getToolbarEl().appendChild( rte.ui.view.toolbar.element );
-            el.contentEditable = true;
-        }else{
-            console.log( 'Editor was not initialized' );
-        }
-        this.focus(el, rte);
-
-
-        return rte;
-    },
-
-    disable(el, rte) {
-        el.contentEditable = false;
-
-    },
-
-    focus(el, rte) {
-        // Do nothing if already focused
-
-        el.contentEditable = true;
-
-    },
-});
-
-// Update RTE toolbar position
-editor.on('rteToolbarPosUpdate', (pos) => {
-    if (pos.top <= pos.canvasTop) {
-        pos.top = pos.elementTop + pos.elementHeight;
-    }
-});
 
 
 
@@ -1500,6 +1433,13 @@ editor.on('load', function() {
         if(!title || title == "Tablet" || title=="Mobile Landscape" || title=="Mobile" || title=="Desktop" || el.parent().hasClass('gjs-blocks-c'))
             return;
         el.attr('data-tooltip', el.attr('title'));
+
+    });
+
+    $('.gjs-mdl-btn-close').on('click', function () {
+        console.log("modal close");
+
+        editor.Modal.close();
 
     });
     /**********************************************************/
